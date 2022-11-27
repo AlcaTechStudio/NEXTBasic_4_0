@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>NEXTBasic_4_0</RootNamespace>
+    <TargetFramework>net6.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="GOLD Engine.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="GOLD Engine.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="GOLD Engine">
+      <HintPath>GOLD Engine.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

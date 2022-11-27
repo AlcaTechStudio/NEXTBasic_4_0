@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "NEXTBasic_4_0": {
+      "commandName": "Project",
+      "commandLineArgs": "-rFF0000 -sFFFFFF -v -a ..\\..\\..\\..\\sample_source.nbs"
+    }
+  }
+}

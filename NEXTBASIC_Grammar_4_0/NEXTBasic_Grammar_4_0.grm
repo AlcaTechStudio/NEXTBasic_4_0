@@ -1,0 +1,263 @@
+﻿"name"     = 'Alca_Tech Software Studio Basic Language grammar'
+"author"   = 'Alcatech'
+"version"  = '4.0'
+"about"    = 'Grammar projetado para o compilador NEXTBasic mult-plataformas'
+
+"case sensitive" = false
+"start symbol" = <Program>
+
+
+! ------------------------
+! Definicao de Caracteres-
+! ------------------------
+{String Chars}  = {Printable} - ["]
+{Hex Digit}     = {Digit} + [abcdef]
+{WS}            = {Whitespace} - {CR} - {LF}
+{Id Tail}       = {Alphanumeric} + [_]
+
+! ----------
+! terminais-
+! ----------
+NewLine        = {CR}{LF} | {CR} | ':' 
+Whitespace     = {WS}+  | '_' {WS}* {CR} {LF}?
+
+Comment_Line   = ''{Printable}*
+comment_line  @= { Type = Noise }
+
+LABEL          = {Letter}{ID Tail}*':'
+
+ID             = [_]*{Letter}{ID Tail}*
+
+asmLiteral     = '_asm_block #__' ({Printable}|{CR}{LF} | {CR})* '__# _asm_block_end'
+StringLiteral  = '"' ( {String Chars} | '""' )* '"'
+decLiteral     = {digit}+ 
+fixliteral     = {digit}+  '.'{digit}+ 
+hexLiteral     = '&H'{Hex Digit}+             
+binLiteral     = '&B'[01]+ 
+chrliteral     = '{'{Printable}'}'
+! ------------------------------------------------------------------
+! Elimina Espaços e quebras de linha antes do Inicio do Source Code-
+! ------------------------------------------------------------------
+<nl>     ::= NewLine <nl>
+           | NewLine
+<nl Opt> ::= NewLine <nl Opt>
+           |
+
+! ------------------------
+! Estruturas da linguagem-
+! ------------------------
+<Program> ::= <nl Opt> <Statements>
+
+<Statements>  ::= <Statement> <Statements>
+                |
+
+<Statement>   ::= <If Stm>
+                | <Select Stm>
+                | '#const' ID '=' <Expression> <NL>
+                | '#Log' stringliteral <NL>
+                | '#compdir' stringliteral <NL>
+                | '#'<cond_comp_beg><expression><NL><Statements><cond_comp_block>'#endif'<NL>
+                | For <variable>  '=' <Expression> To <Expression> <NL> <Statements> <next_fn> <NL>
+                | For <variable>  '=' <Expression> To <Expression> step <expression> <NL> <Statements> <next_fn> <NL>
+                | Do <NL> <statements> loop <NL>
+                | While '(' <Expression> ')' <NL> <Statements> <while_end> <NL>
+                | While '(' <expression> ')' <Non-Block Stm> <NL>
+                | sysreg ID as <var_type> at hexLiteral <NL>               
+                | <dim_g> ID <var_opt_param> as <var_type> <var_opt_assing> <NL>
+                | Structure ID <NL> <Enum List> End Structure <NL>
+                | <function_dec_s><NL>
+                | <sub_dec_s><NL>
+                | imports stringLiteral <NL>
+                | Equal ID stringLiteral<NL>
+                | LABEL                 <NL>
+                | Data       <data list><NL>
+                | Dataint    <data list><NL>
+                | Datalong   <data list><NL>
+                | asmLiteral <NL>
+                | <Non-Block Stm> <NL>
+
+<Non-Block Stm> ::= Exit Do
+                  | Exit For
+                  | Exit While
+                  | Exit Select
+                  | GoTo ID
+                  | _asm '(' stringliteral ')'
+                  | Return
+                  | Return <Expression>
+                  | Bit_Set'('<Variable> ',' <expression>')'
+                  | Bit_Clear'('<Variable> ',' <expression>')'
+                  | push'(' <Expression> as <reg_size> ',' stringLiteral ')'
+                  | poke'(' <expression> as <reg_size> ',' <expression> ')'
+                  | <Variable> <Assign Op> <Expression>
+                  | <sub_call>
+
+<function_dec_s> ::= <opt_inline>Function ID <Param List> as <var_type> <NL> <statements> end function 
+<sub_dec_s>      ::= <opt_inline>Sub ID <Param List> <NL> <statements> end sub
+
+<var_opt_param>  ::= '['<var_Argument_dec>']' | '['']' |
+<var_opt_assing> ::= '=' <expression> | 
+<while_end>      ::= end while | wend
+<Assign Op>      ::= '=' |  '*=' | '/='  | '\=' | '+=' | '-=' | '<<=' | '>>=' | '&=' | '|=' | '^=' | '~='
+<next_fn>        ::= next | next ID
+<dim_g>          ::= dim  | global                  
+<opt_inline>     ::= 'inline' | 
+
+!-------------------------------------
+! Diretiva de compilação Condicional -
+!-------------------------------------
+<cond_comp_beg> ::= 'if'
+                  | 'ifdef'
+                  | 'ifndef'
+                  
+<cond_comp_block> ::= '#Else'<cond_comp_beg><expression><NL><Statements><cond_comp_block>
+                    | '#Else' <NL><Statements>
+                    |
+                  
+! -------------
+! Estrutura IF-
+! -------------
+<If Stm>    ::= If <Expression> Then <NL> <Statements> <If Blocks> <if_e> <NL>
+              | If <Expression> Then <Non-Block Stm> <NL>
+              | If <Expression> Then <Non-Block Stm> Else <Non-Block Stm> <NL>
+<If Blocks> ::= <else_if> <Expression> then <NL> <Statements> <If Blocks>
+              | Else <NL> <Statements>
+              |
+<if_e>      ::= end if | endif
+<else_if>   ::= Elseif | else if   
+
+! --------------------
+! Tipos de variaveis -
+! --------------------
+<var_type>    ::= <opt_var_attb>'Byte' |<opt_var_attb>'word' | <opt_var_attb>'long' | <opt_var_attb>'integer' |'string'| <opt_var_attb>'fixed' | <opt_var_attb>'single' | new ID | ID
+<opt_var_attb>    ::= 'signed' | 'unsigned' |
+! ---------------------------
+! Structure -> Matrizes indexadas-
+! ---------------------------
+<Enum List>     ::= <Enum Item> <Enum List>
+                  |
+<Enum Item>     ::= dim ID as <var_type> <NL>
+                  | <sub_dec_s><NL>
+                  | <function_dec_s><NL>
+     
+! -----------------
+! Estrutura Select-
+! -----------------
+<Select Stm>    ::= Select <Expression> <NL> <Select Blocks> End Select <NL>
+
+<Select Blocks> ::= Case <expression> <NL> <Statements>  <Select Blocks>
+                  | Case Else <NL> <Statements>
+                  |
+
+! -----------------------
+! Expressoes Matematicas-
+! -----------------------
+<Expression>  ::= <And Exp> Or   <Expression>
+                | <And Exp> XOr  <Expression>
+                | <And Exp>
+
+<And Exp>     ::= <Not Exp> And  <And Exp>
+                | <Not Exp>
+
+<Not Exp>     ::= NOT <Compare Exp> ! Retorna true quando é false
+                | <Compare Exp>
+
+<Compare Exp> ::= <Shift Exp> <Compare Op> <Compare Exp>
+                | <Shift Exp>
+
+<Shift Exp>   ::= <Add Exp> '<<' <Shift Exp>
+                | <Add Exp> '>>' <Shift Exp>
+                | <Add Exp>
+
+<Add Exp>     ::= <Modulus Exp> '+' <Add Exp>
+                | <Modulus Exp> '-' <Add Exp>
+                | <Modulus Exp>
+
+<Modulus Exp> ::= <Int Div Exp> Mod <Modulus Exp>
+                | <Int Div Exp>
+
+<Int Div Exp> ::= <Mult Exp> '\' <Int Div Exp>
+                | <Mult Exp>
+
+<Mult Exp>    ::= <Negate Exp> '*' <Mult Exp>
+                | <Negate Exp> '/' <Mult Exp>
+                | <Negate Exp>
+
+<Negate Exp>  ::= '-' <value>
+                | '~' <value> ! Operação Bitwise Not
+                |     <value>
+
+<Value>       ::= '(' <Expression> ')'
+                | decLiteral
+                | fixliteral
+                | HexLiteral
+                | BinLiteral
+                | chrliteral
+                | StringLiteral
+                | True
+                | False
+                | AddressOf '(' <Variable> ')'
+                | pop '(' StringLiteral as <reg_size> ')'
+                | peek'(' <expression>  as <reg_size> ')'
+                | Bit_Test'('<Expression> ',' <expression>')'
+                | ID'.'decLiteral
+                | <Variable>
+                | <func_call>
+                | '['<data list>']' 
+
+<Variable>    ::= ID'['<var_Argument>']'
+                | ID'['<var_Argument>']''.'ID
+                | ID'.'ID
+                | ID
+
+<func_call>    ::=  <Variable><Argument List_F>
+<sub_call>     ::=  <Variable><Argument List_F> 
+                 
+<Compare Op>  ::= '=' | '<>' | '<' | '>' | '>=' | '<='
+!---------------------------
+!  Declaracao de constantes-
+!---------------------------
+
+<data list> ::= <data> ',' <data list>
+              | <data>
+
+<data> ::= decLiteral
+         | fixliteral
+         | '-'decLiteral
+         | '-'fixliteral
+         | HexLiteral
+         | BinLiteral
+         | StringLiteral
+         | chrliteral
+         | ID
+        
+! ------------------------
+! Parametros e Argumentos-
+! ------------------------
+<var_Argument_dec>  ::= <var_arg_dec> ',' <var_Argument_dec>
+                      | <var_arg_dec>
+
+<var_arg_dec> ::= decLiteral
+                | HexLiteral
+                | BinLiteral
+                | chrliteral
+          
+<var_Argument>  ::= <var_arg> ',' <var_Argument>
+                  | <var_arg>
+
+<var_arg> ::= <Expression>
+
+<Argument List_F>  ::= '(' <Argument Items_F> ')'
+                     | '(' ')'
+<Argument Items_F> ::= <Expression> ',' <Argument Items_F>
+                     | <Expression>
+
+<Param List>     ::= '(' <Param Items> ')'
+                   | '(' ')'
+
+<Param Items>    ::= <Param Item> ',' <Param Items>
+                   | <Param Item>
+
+<Param Item>     ::= ByVal ID as <var_Type>
+                   | ByRef ID as <var_Type>
+
+<reg_size>           ::= 'Byte'|'Word'|'integer'|'Long'
