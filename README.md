@@ -10,7 +10,7 @@ O Parser foi escrito em BNF feito na Gold Parser Engine e o compilador esta send
   
   http://www.goldparser.org/builder/index.htm
   
-  É importante que as alterações no Grammar sejam feitas com muita cautela (e se possivel evitadas ao maximo a menos que sejam realmente necessarias) pois sempre que um novo esqueleto for gerado sera necessario migrar esse código para o projedo no Visual Studio o que inclui alterar 3 arquivos de código fonte (gmr_cabecalho.vb, Program.vb e Pre_Processor.vb).
+  É importante que as alterações no Grammar sejam feitas com muita cautela (e se possivel evitadas ao maximo a menos que sejam realmente necessarias) pois sempre que um novo esqueleto for gerado sera necessario migrar esse código para o projedo no Visual Studio o que inclui alterar 3 arquivos de código fonte (gmr_cabecalho.vb, NEXTBasic_Grammar_4_0.vb e Pre_Processor.vb).
 
 
 #Lista de coisas a fazer:
