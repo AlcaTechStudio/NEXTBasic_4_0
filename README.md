@@ -17,14 +17,14 @@ O Parser foi escrito em BNF feito na Gold Parser Engine e o compilador esta send
 
   - Completar o modulo de analise recursiva do pre-processor
     -Percorrer a Arvore de Sintaxe Abstrata
-    -Registrar os identificadores (Alias, Strucutures, Funções, Subrotinas, labels, variaveis Globais, includes, etc.)
-    -Aplicar alterações necessarias no source code pré-compaliação
+    -Registrar os identificadores (Alias, Structures, Funções, Subrotinas, labels, variaveis Globais, includes, etc.)
+    -Aplicar alterações necessarias no source code pré-compilação
     
   - Completar o modulo de analise recursiva do Compilador
-    -Percorrer a Arvore de Sintaxe Abstrata resolvendo os Steatments
-    -A cada Steatmente resolvido gerar o algoritimo equivalente em Three-Code-Address
+    -Percorrer a Arvore de Sintaxe Abstrata resolvendo os Statements
+    -A cada Statement resolvido gerar o algoritimo equivalente em Three-Code-Address
   
   - Completar o modulo de conversão do Código em Three-Code-address em Assembly para a plataforma desejada
   
-  - Compilar o Assembly resultando da conversão (na etapa Anterior)
+  - Compilar o Assembly resultante da conversão (na etapa Anterior)
     
